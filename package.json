@@ -9,7 +9,6 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --build && vite build",
-    "build:mobile": "vue-tsc --build && vite build --mode mobile",
     "preview": "vite preview",
     "type-check": "vue-tsc --build",
     "test": "vitest run",

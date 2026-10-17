@@ -1,6 +1,6 @@
 /**
- * Tek depolama soyutlaması. Web'de sessionStorage kullanır; mobilde (Faz 8) aynı arayüz
- * @capacitor/preferences ile karşılanır, bu yüzden API asenkrondur.
+ * Tek depolama soyutlaması (şimdilik sessionStorage). Depolama arkasında değiştirilebilsin
+ * diye API asenkron tutuldu.
  * Depolama kullanılamazsa (gizli sekme, kota) sessizce çalışmaya devam eder.
  */
 export const storage = {

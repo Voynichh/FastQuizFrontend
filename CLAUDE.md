@@ -8,7 +8,7 @@ Proje dokümanı: `docs/PROJECT.md` (Bölüm 8–9: ekranlar, bileşenler, tema)
 - `v-html` yasak (ESLint kuralı); kullanıcı metni her zaman metin olarak basılır.
 - Renkler yalnızca `src/styles/main.css` içindeki `@theme` tokenlarından gelir; bileşenlerde hex yok. Kategori rengi API'den token adı (`cat-ai`) olarak gelir ve `var(--color-…)` ile okunur (bu yüzden `@theme static`).
 - Doğru/yanlış yalnızca renkle değil ikonla (✓/✕) da gösterilir; dokunma alanı ≥ 44px, odak halkası görünür, `prefers-reduced-motion` desteklenir.
-- Depolama yalnızca `src/lib/storage.ts` üzerinden (web: sessionStorage, mobilde Preferences). Platform farkı `src/lib/platform.ts`.
+- Depolama yalnızca `src/lib/storage.ts` üzerinden (şimdilik sessionStorage). `X-Client` değeri `src/lib/platform.ts` içinde.
 - Arayüz metinleri Türkçe, kod/identifier İngilizce.
 
 ## Komutlar
@@ -43,4 +43,4 @@ npm run build
 Yerelde çalışan portföy projesi; **canlıya alma iptal edildi** (bkz. `..\CLAUDE.md`). README'deki ekran görüntüleri `docs/screenshots/` altında (mobil görünüm 375×812).
 
 ## Durum
-Faz 4–6 tamam: kategori → quiz → sonuç → isim → skor tablosu uçtan uca çalışıyor (128 test). Sıradaki: **Faz 8 — Capacitor ile mobil** (ayrıntılar `..\CLAUDE.md`). Ses efektleri ve haptics mobil sonrası.
+Faz 4–6 tamam: kategori → quiz → sonuç → isim → skor tablosu uçtan uca çalışıyor (128 test). **Mobil uygulama iptal edildi (kullanıcı kararı); proje web olarak tamamlandı.** İsteğe bağlı kalanlar: Playwright E2E, erişilebilirlik denetimi, ses efektleri (varsayılan kapalı).

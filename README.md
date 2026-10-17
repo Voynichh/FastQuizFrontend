@@ -9,7 +9,7 @@
 
 **Fast Quiz**, her soruyu **5 saniyede** cevapladığın, üyeliksiz bir bilgi yarışması oyunudur: bir kategori seç, 20 soruyu yanıtla, puanını gör, takma adını yaz ve skor tablosunda yerini al.
 
-Bu repo oyunun **mobil öncelikli web arayüzüdür** (Vue 3 + TypeScript). Tüm kurallar (süre, puan, sıralama) sunucuda işler; arayüz yalnızca ekranı çizer. API: **[FastQuizBackend](https://github.com/Voynichh/FastQuizBackend)**. Aynı kod daha sonra Capacitor ile iOS/Android'e paketlenecek.
+Bu repo oyunun **mobil öncelikli (responsive) web arayüzüdür** (Vue 3 + TypeScript). Tüm kurallar (süre, puan, sıralama) sunucuda işler; arayüz yalnızca ekranı çizer. API: **[FastQuizBackend](https://github.com/Voynichh/FastQuizBackend)**.
 
 <p align="center">
   <img src="docs/screenshots/01-home.jpg" width="190" alt="Ana sayfa" />
@@ -86,8 +86,7 @@ docs/PROJECT.md     başlangıç proje dokümanı
 ## Yol haritası
 
 - [x] Web arayüzü: kategori → quiz → sonuç → skor tablosu
-- [ ] Mobil uygulama (Capacitor ile iOS/Android; aynı kod ve aynı API)
-- [ ] Ses efektleri ve titreşim (varsayılan kapalı)
+- [ ] Ses efektleri (varsayılan kapalı)
 - [ ] Playwright ile uçtan uca testler
 
 ## Lisans
