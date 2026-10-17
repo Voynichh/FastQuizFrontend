@@ -4,10 +4,12 @@ import { ref } from 'vue'
 import {
   createSession,
   getCurrentQuestion,
+  getResult,
+  saveScore as saveScoreRequest,
   submitAnswer as submitAnswerRequest,
 } from '@/api/endpoints'
 import { storage } from '@/lib/storage'
-import type { AnswerResult, CategoryBrief, CurrentQuestion } from '@/types'
+import type { AnswerResult, CategoryBrief, CurrentQuestion, SessionResult } from '@/types'
 
 const STORAGE_KEY = 'fastquiz.session'
 
@@ -20,6 +22,15 @@ export interface QuestionView {
   choices: { id: number; text: string }[]
 }
 
+/** Skor tablosuna kaydedilen skor; tabloda satırı vurgulamak için saklanır */
+export interface SavedScore {
+  playerName: string
+  rank: number
+  inTop10: boolean
+  score: number
+  categorySlug: string
+}
+
 interface PersistedSession {
   sessionId: string
   sessionToken: string
@@ -28,6 +39,7 @@ interface PersistedSession {
   timeLimitMs: number
   totalScore: number
   results: (Outcome | null)[]
+  saved?: SavedScore | null
 }
 
 /**
@@ -52,6 +64,8 @@ export const useQuizStore = defineStore('quiz', () => {
   const results = ref<(Outcome | null)[]>([])
   /** Yeni açılan oturumda quiz öncesi 3-2-1 gösterilir, yenilemede gösterilmez */
   const needsCountdown = ref(false)
+  const result = ref<SessionResult | null>(null)
+  const saved = ref<SavedScore | null>(null)
 
   function apply(session: PersistedSession) {
     sessionId.value = session.sessionId
@@ -61,6 +75,7 @@ export const useQuizStore = defineStore('quiz', () => {
     timeLimitMs.value = session.timeLimitMs
     totalScore.value = session.totalScore
     results.value = session.results
+    saved.value = session.saved ?? null
     position.value = session.results.findIndex((r) => r === null)
     if (position.value < 0) position.value = session.results.length
     status.value = 'active'
@@ -76,6 +91,7 @@ export const useQuizStore = defineStore('quiz', () => {
       timeLimitMs: timeLimitMs.value,
       totalScore: totalScore.value,
       results: results.value,
+      saved: saved.value,
     }
     await storage.setItem(STORAGE_KEY, JSON.stringify(session))
   }
@@ -156,6 +172,38 @@ export const useQuizStore = defineStore('quiz', () => {
     return result
   }
 
+  /** Bitmiş oturumun özetini ve tahmini sıralamayı sunucudan alır. */
+  async function loadResult(): Promise<SessionResult> {
+    const { id, token } = requireSession()
+    const summary = await getResult(id, token)
+    result.value = summary
+    totalScore.value = summary.total_score
+    return summary
+  }
+
+  /** İsmi gönderir; puanı sunucu oturumdan okur. Başarılıysa özeti ve vurgu bilgisini günceller. */
+  async function saveScore(playerName: string) {
+    const { id, token } = requireSession()
+    const response = await saveScoreRequest(id, token, playerName.trim())
+    saved.value = {
+      playerName: playerName.trim(),
+      rank: response.rank,
+      inTop10: response.in_top_10,
+      score: response.score,
+      categorySlug: category.value?.slug ?? '',
+    }
+    if (result.value) {
+      result.value = {
+        ...result.value,
+        score_saved: true,
+        estimated_rank: response.rank,
+        in_top_10: response.in_top_10,
+      }
+    }
+    await persist()
+    return response
+  }
+
   async function reset() {
     sessionId.value = null
     sessionToken.value = null
@@ -169,6 +217,8 @@ export const useQuizStore = defineStore('quiz', () => {
     totalScore.value = 0
     results.value = []
     needsCountdown.value = false
+    result.value = null
+    saved.value = null
     status.value = 'idle'
     await storage.removeItem(STORAGE_KEY)
   }
@@ -187,10 +237,14 @@ export const useQuizStore = defineStore('quiz', () => {
     totalScore,
     results,
     needsCountdown,
+    result,
+    saved,
     startSession,
     restore,
     loadCurrent,
     submitAnswer,
+    loadResult,
+    saveScore,
     reset,
   }
 })

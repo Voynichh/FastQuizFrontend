@@ -1,15 +1,23 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createSession, getCurrentQuestion, submitAnswer } from '@/api/endpoints'
+import {
+  createSession,
+  getCurrentQuestion,
+  getResult,
+  saveScore,
+  submitAnswer,
+} from '@/api/endpoints'
 import { useQuizStore } from '@/stores/quiz'
 
-import { created, makeAnswer, makeCurrent, SESSION_ID } from '../helpers'
+import { created, makeAnswer, makeCurrent, makeResult, SESSION_ID } from '../helpers'
 
 vi.mock('@/api/endpoints', () => ({
   createSession: vi.fn(),
   getCurrentQuestion: vi.fn(),
   submitAnswer: vi.fn(),
+  getResult: vi.fn(),
+  saveScore: vi.fn(),
 }))
 
 const STORAGE_KEY = 'fastquiz.session'
@@ -147,5 +155,65 @@ describe('quiz store: soru ve cevap', () => {
     expect(fresh.position).toBe(1)
     expect(fresh.needsCountdown).toBe(false)
     expect(fresh.status).toBe('active')
+  })
+})
+
+describe('quiz store: sonuç ve skor', () => {
+  async function started() {
+    vi.mocked(createSession).mockResolvedValue(created)
+    const quiz = useQuizStore()
+    await quiz.startSession('yapay-zeka')
+    return quiz
+  }
+
+  it('loadResult özeti sunucudan alır', async () => {
+    const quiz = await started()
+    vi.mocked(getResult).mockResolvedValue(makeResult({ total_score: 3000 }))
+    const summary = await quiz.loadResult()
+    expect(getResult).toHaveBeenCalledWith(SESSION_ID, 'tok')
+    expect(summary.total_score).toBe(3000)
+    expect(quiz.result?.total_score).toBe(3000)
+    expect(quiz.totalScore).toBe(3000)
+  })
+
+  it('saveScore adı kırpıp gönderir; sırayı işler ve kalıcılaştırır', async () => {
+    const quiz = await started()
+    vi.mocked(getResult).mockResolvedValue(makeResult())
+    await quiz.loadResult()
+    vi.mocked(saveScore).mockResolvedValue({ rank: 2, in_top_10: true, score: 2310 })
+
+    await quiz.saveScore('  Ece ')
+    expect(saveScore).toHaveBeenCalledWith(SESSION_ID, 'tok', 'Ece')
+    expect(quiz.saved).toEqual({
+      playerName: 'Ece',
+      rank: 2,
+      inTop10: true,
+      score: 2310,
+      categorySlug: 'yapay-zeka',
+    })
+    expect(quiz.result).toMatchObject({ score_saved: true, estimated_rank: 2, in_top_10: true })
+    expect(persisted().saved.playerName).toBe('Ece')
+  })
+
+  it('kaydedilmiş skor yenilemeden sonra geri yüklenir; reset temizler', async () => {
+    const quiz = await started()
+    vi.mocked(saveScore).mockResolvedValue({ rank: 1, in_top_10: true, score: 100 })
+    await quiz.saveScore('Ece')
+
+    setActivePinia(createPinia())
+    const fresh = useQuizStore()
+    await fresh.restore()
+    expect(fresh.saved?.playerName).toBe('Ece')
+
+    await fresh.reset()
+    expect(fresh.saved).toBeNull()
+    expect(fresh.result).toBeNull()
+  })
+
+  it('sunucu hatasında saved ayarlanmaz', async () => {
+    const quiz = await started()
+    vi.mocked(saveScore).mockRejectedValue(new Error('nope'))
+    await expect(quiz.saveScore('Ece')).rejects.toThrow('nope')
+    expect(quiz.saved).toBeNull()
   })
 })

@@ -33,6 +33,12 @@ npm run build
 - Klavye: 1–4 veya A–D. Çıkış: ✕ veya tarayıcı geri tuşu → "Quizden çıkılsın mı?" onayı (`onBeforeRouteLeave`; bu koruma yalnızca `RouterView` içinde çalışır).
 - Store sonuç şeridini (`results`) ve skoru depolamaya yazar; aktif soru yenilemede sunucudan alınır.
 
+## Sonuç ve skor tablosu (Faz 6)
+- `ResultView`: `quiz.loadResult()` ile özet (puan `ScoreCounter` ile sayarak artar, doğru/yanlış/boş, ortalama süre, tahmini sıra). İsim `NameForm` ile anlık doğrulanır (`lib/playerName.ts`, sunucuyla aynı karakter kuralı; küfür denetimi yalnızca sunucuda, hata alanın altında gösterilir). Kayıt başarılıysa ilk 10'da `ConfettiBurst` (hareketi azalt tercihinde çizilmez).
+- Kaydedilen skor store'da `saved` olarak tutulup depolamaya yazılır; skor tablosunda satırı vurgulamak için kullanılır (kategori sekmesinde isim+puan+sıra, genel sekmede isim+puan eşleşmesi).
+- `LeaderboardView`: Genel + kategori sekmeleri (`?kategori=slug`, URL'de tutulur), yarış durumuna karşı istek sayacı, boş/hata/yükleniyor durumları. İlk üç sıra madalya rozetli (`--color-medal-*`).
+- `Tekrar oyna` / `Kaydetmeden çık` oturumu siler (`quiz.reset()`).
+
 ## Durum
-Faz 4–5 tamam. Quiz uçtan uca oynanabiliyor (soru, sayaç, geri bildirim, yenileme, çıkış onayı). Bitişte `/sonuc/:id` hâlâ `PlaceholderView`.
-Sıradaki: Faz 6 (sonuç ekranı + `ScoreCounter` + `NameForm` + skor tablosu + konfeti). Ses efektleri (varsayılan kapalı) ve haptics henüz yok; Faz 6/8'de eklenecek.
+Faz 4–6 tamam: ana akış (kategori → quiz → sonuç → isim → skor tablosu) uçtan uca çalışıyor.
+Sıradaki: Faz 7 (kalite ve yayın): Playwright E2E, erişilebilirlik kontrolü, **DigitalOcean deploy (kullanıcıyla önce konuşulacak)**, Sentry. Ses efektleri (varsayılan kapalı) ve haptics henüz yok (Faz 8 ile birlikte).

@@ -23,6 +23,11 @@
   --color-cat-countries: #3fd0b4;
   --color-cat-physics: #f5b84c;
 
+  /* Skor tablosu madalyaları */
+  --color-medal-gold: #f5b84c;
+  --color-medal-silver: #c4c8dc;
+  --color-medal-bronze: #d9915e;
+
   --font-heading: 'Outfit Variable', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
 

@@ -21,14 +21,14 @@ const router = createRouter({
     {
       path: '/sonuc/:sessionId',
       name: 'result',
-      component: () => import('@/views/PlaceholderView.vue'),
-      meta: { title: 'Sonuç', placeholder: 'Sonuç ekranı yakında.' },
+      component: () => import('@/views/ResultView.vue'),
+      meta: { title: 'Sonuç' },
     },
     {
       path: '/skor-tablosu',
       name: 'leaderboard',
-      component: () => import('@/views/PlaceholderView.vue'),
-      meta: { title: 'Skor tablosu', placeholder: 'Skor tablosu yakında.' },
+      component: () => import('@/views/LeaderboardView.vue'),
+      meta: { title: 'Skor tablosu' },
     },
     {
       path: '/:pathMatch(.*)*',
