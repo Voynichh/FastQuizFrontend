@@ -15,8 +15,8 @@ const router = createRouter({
     {
       path: '/quiz/:sessionId',
       name: 'quiz',
-      component: () => import('@/views/PlaceholderView.vue'),
-      meta: { title: 'Quiz', placeholder: 'Soru ekranı bir sonraki fazda geliyor.' },
+      component: () => import('@/views/QuizView.vue'),
+      meta: { title: 'Quiz' },
     },
     {
       path: '/sonuc/:sessionId',

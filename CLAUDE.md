@@ -25,6 +25,14 @@ npm run build
 - Dokümandakinden bilinçli sapmalar (kullanıcı "en güncel sürümler" istedi): Pinia 4.x (doc: 3.x), Vitest 5.x (doc: 4). Vite 8.3, Vue 3.5.44, Vue Router 5.4, Tailwind 4.3.3, Node ≥ 24.
 - `eslint` yapılandırması `@vue/eslint-config-typescript` olmadan doğrudan `typescript-eslint` + `eslint-plugin-vue` ile (npm audit temiz kalsın diye).
 
+## Quiz akışı (Faz 5)
+- `QuizView` → `useQuizSession` (durum makinesi: loading → countdown → question → feedback → error) → Pinia `quiz` store → `src/api/endpoints.ts`.
+- Geri sayım (3-2-1) yalnızca yeni açılan oturumda gösterilir (`needsCountdown`); sunucuda süre ilk `GET /current/` ile başlar, bu yüzden bu istek geri sayımdan SONRA atılır. Yenilemede geri sayım yok, `loadCurrent` aynı `deadline`'ı döner.
+- `useCountdown`: `deadline − server_time` farkıyla yerel bitişi hesaplar (cihaz saatinden bağımsız), `performance.now()` + rAF kullanır; süre dolunca `choice_id: null` gönderilir.
+- Cevap gönderilince şıklar kilitlenir (`busy`), ~800 ms (`FEEDBACK_MS`) doğru/yanlış gösterilir, sonra sıradaki soru istenir. `already_answered`/`question_mismatch` gelirse sunucudaki duruma göre yeniden senkronize olunur; ağ hatasında "Tekrar dene" aynı cevabı yeniden gönderir; `invalid_session_token`/`not_found`/`session_abandoned` kurtarılamaz sayılır (oturum silinip ana sayfaya dönülür).
+- Klavye: 1–4 veya A–D. Çıkış: ✕ veya tarayıcı geri tuşu → "Quizden çıkılsın mı?" onayı (`onBeforeRouteLeave`; bu koruma yalnızca `RouterView` içinde çalışır).
+- Store sonuç şeridini (`results`) ve skoru depolamaya yazar; aktif soru yenilemede sunucudan alınır.
+
 ## Durum
-Faz 4 tamam: iskelet, tema, API istemcisi + üretilmiş tipler, router, Pinia `quiz` store (oturum açma + yenilemeye dayanıklılık), Ana sayfa ve Kategori ekranı. `quiz`, `sonuc`, `skor-tablosu` yolları `PlaceholderView` gösterir.
-Sıradaki: Faz 5 (geri sayım, soru ekranı, `TimerRing`, `useCountdown`, cevap geri bildirimi, `loadCurrent`/`submitAnswer`).
+Faz 4–5 tamam. Quiz uçtan uca oynanabiliyor (soru, sayaç, geri bildirim, yenileme, çıkış onayı). Bitişte `/sonuc/:id` hâlâ `PlaceholderView`.
+Sıradaki: Faz 6 (sonuç ekranı + `ScoreCounter` + `NameForm` + skor tablosu + konfeti). Ses efektleri (varsayılan kapalı) ve haptics henüz yok; Faz 6/8'de eklenecek.

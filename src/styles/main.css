@@ -104,6 +104,42 @@
   opacity: 0;
 }
 
+/* Yanlış cevapta hafif yatay sallanma (≤ 200 ms) */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+@utility animate-shake {
+  animation: shake 0.2s ease-out;
+}
+
+/* Soru geçişi: kayma + solma (≤ 250 ms) */
+.question-enter-active,
+.question-leave-active {
+  transition:
+    opacity 0.15s ease-out,
+    transform 0.15s ease-out;
+}
+
+.question-enter-from {
+  opacity: 0;
+  transform: translateX(24px);
+}
+
+.question-leave-to {
+  opacity: 0;
+  transform: translateX(-24px);
+}
+
 /* Hareketi azalt: tüm animasyonlar yalnızca solmaya iner */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -114,7 +150,9 @@
     scroll-behavior: auto !important;
   }
 
-  .page-enter-from {
+  .page-enter-from,
+  .question-enter-from,
+  .question-leave-to {
     transform: none;
   }
 
