@@ -13,7 +13,7 @@ Proje dokümanı: `docs/PROJECT.md` (Bölüm 8–9: ekranlar, bileşenler, tema)
 
 ## Komutlar
 ```
-npm run dev           # http://localhost:5173 (backend: ..\FastQuizBackend, runserver :8000)
+npm run dev           # http://localhost:5173 (PowerShell'de `npm.cmd run dev`) (backend: ..\FastQuizBackend, runserver :8000)
 npm run test          # vitest
 npm run lint && npm run type-check && npm run format:check
 npm run build
@@ -38,6 +38,9 @@ npm run build
 - Kaydedilen skor store'da `saved` olarak tutulup depolamaya yazılır; skor tablosunda satırı vurgulamak için kullanılır (kategori sekmesinde isim+puan+sıra, genel sekmede isim+puan eşleşmesi).
 - `LeaderboardView`: Genel + kategori sekmeleri (`?kategori=slug`, URL'de tutulur), yarış durumuna karşı istek sayacı, boş/hata/yükleniyor durumları. İlk üç sıra madalya rozetli (`--color-medal-*`).
 - `Tekrar oyna` / `Kaydetmeden çık` oturumu siler (`quiz.reset()`).
+
+## Deploy (sonraki oturum)
+Proje geneli deploy kararı ve panele girilecek değerler `..\CLAUDE.md` ("DEPLOY" bölümü) içinde. Frontend için: DigitalOcean Static Site, build `npm ci && npm run build`, çıktı `dist`, catch-all `index.html`, BUILD_TIME env `VITE_API_BASE_URL`. Deploy `doctl` ile değil kullanıcı tarafından panelden elle yapılacak; başlamadan önce kullanıcıyla konuş. Frontend `.do/app.yaml` yazılmadı.
 
 ## Durum
 Faz 4–6 tamam: ana akış (kategori → quiz → sonuç → isim → skor tablosu) uçtan uca çalışıyor.
