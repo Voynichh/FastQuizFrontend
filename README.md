@@ -39,7 +39,7 @@ Bu repo oyunun **mobil öncelikli (responsive) web arayüzüdür** (Vue 3 + Type
 | --- | --- |
 | Çatı | Vue 3.5 (Composition API, `<script setup>`), Vue Router 5, Pinia 4 |
 | Dil / araçlar | TypeScript 6, Vite 8, Tailwind CSS 4, Axios |
-| Test | Vitest 5, Vue Test Utils, jsdom · **128 test** |
+| Test | Vitest 5, Vue Test Utils, jsdom · **143 test** |
 | Kalite | ESLint 10 (flat config), Prettier, `vue-tsc`, GitHub Actions |
 
 ## Hızlı başlangıç

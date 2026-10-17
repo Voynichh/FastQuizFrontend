@@ -43,4 +43,4 @@ npm run build
 Yerelde çalışan portföy projesi; **canlıya alma iptal edildi** (bkz. `..\CLAUDE.md`). README'deki ekran görüntüleri `docs/screenshots/` altında (mobil görünüm 375×812).
 
 ## Durum
-Faz 4–6 tamam: kategori → quiz → sonuç → isim → skor tablosu uçtan uca çalışıyor (128 test). **Mobil uygulama iptal edildi (kullanıcı kararı); proje web olarak tamamlandı.** İsteğe bağlı kalanlar: Playwright E2E, erişilebilirlik denetimi, ses efektleri (varsayılan kapalı).
+Faz 4–6 tamam: kategori → quiz → sonuç → isim → skor tablosu uçtan uca çalışıyor (143 test). **Mobil uygulama iptal edildi (kullanıcı kararı); proje web olarak tamamlandı.** İsteğe bağlı kalanlar: Playwright E2E, erişilebilirlik denetimi, ses efektleri (varsayılan kapalı).

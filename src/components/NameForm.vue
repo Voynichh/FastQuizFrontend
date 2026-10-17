@@ -56,7 +56,7 @@ function onSubmit() {
       <template v-if="clientError || serverError">
         <span aria-hidden="true">✕ </span>{{ clientError ?? serverError }}
       </template>
-      <template v-else>2–20 karakter; harf, rakam, boşluk ve _ - .</template>
+      <template v-else>2–20 karakter; Latin harf, rakam, boşluk ve _ - .</template>
     </p>
     <AppButton type="submit" :loading="loading" class="w-full">Skoru kaydet</AppButton>
   </form>

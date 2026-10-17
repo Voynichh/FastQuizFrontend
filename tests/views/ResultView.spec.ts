@@ -138,6 +138,20 @@ describe('ResultView: skor kaydı', () => {
     expect(wrapper.get('input').attributes('disabled')).toBeUndefined()
   })
 
+  it('hız denetimine takılan skoru (score_rejected) açıklayıcı mesajla gösterir', async () => {
+    vi.mocked(saveScore).mockRejectedValue(
+      new ApiRequestError(
+        'score_rejected',
+        'Cevap süren gerçekçi görünmediği için skor tabloya eklenemedi.',
+        400,
+      ),
+    )
+    const { wrapper } = await openResult()
+    await fillAndSubmit(wrapper, 'Robot')
+    expect(wrapper.text()).toContain('gerçekçi görünmediği için')
+    expect(wrapper.get('input').attributes('disabled')).toBeUndefined()
+  })
+
   it('çift gönderimde yalnızca bir istek atılır', async () => {
     vi.mocked(saveScore).mockImplementation(() => new Promise(() => {}))
     const { wrapper } = await openResult()

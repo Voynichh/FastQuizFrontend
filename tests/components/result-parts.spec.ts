@@ -93,7 +93,7 @@ describe('NameForm', () => {
     expect(wrapper.get('input').attributes('aria-invalid')).toBe('true')
 
     await wrapper.get('input').setValue('Ece!')
-    expect(wrapper.text()).toContain('Yalnızca harf, rakam')
+    expect(wrapper.text()).toContain('Yalnızca Latin harf, rakam')
     await wrapper.get('form').trigger('submit')
     expect(wrapper.emitted('submit')).toBeUndefined()
 
