@@ -1,0 +1,125 @@
+@import 'tailwindcss';
+
+/* Tema tokenları (docs/PROJECT.md Bölüm 9). Renkler tek yerden buradan okunur.
+   `static`: kategori renkleri API'den gelen ada göre çalışma anında `var(--color-…)` ile
+   okunduğu için kullanılmayan token'lar da CSS'e yazılmalı. */
+@theme static {
+  --color-bg: #1e2034;
+  --color-surface: #282b45;
+  --color-surface-raised: #33375a;
+  --color-border: #3f4468;
+  --color-text: #f2f3fa;
+  --color-text-muted: #a9adcb;
+  --color-primary: #8b7cf6;
+  --color-primary-hover: #9d90f8;
+  --color-success: #4ade9a;
+  --color-danger: #f27a7a;
+  --color-warning: #f5b84c;
+
+  /* Kategori renkleri; API `color` alanı bu token adlarını döner (ör. cat-ai) */
+  --color-cat-software: #8b7cf6;
+  --color-cat-compeng: #5ab8f0;
+  --color-cat-ai: #e57cd8;
+  --color-cat-countries: #3fd0b4;
+  --color-cat-physics: #f5b84c;
+
+  --font-heading: 'Outfit Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 20px;
+  --radius-control: 14px;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    min-height: 100dvh;
+    margin: 0;
+    background-color: var(--color-bg);
+    font-variant-numeric: tabular-nums;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  /* Her etkileşimli öğede görünür odak halkası */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+    border-radius: var(--radius-control);
+  }
+}
+
+/* Arka planda soluk, büyük ve bulanık iki renk lekesi (mor + turkuaz) */
+#app::before,
+#app::after {
+  content: '';
+  position: fixed;
+  z-index: -1;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+#app::before {
+  top: -25vmax;
+  left: -20vmax;
+  background: var(--color-cat-software);
+}
+
+#app::after {
+  right: -25vmax;
+  bottom: -25vmax;
+  background: var(--color-cat-countries);
+}
+
+/* Sayfa geçişi: kısa ve ease-out */
+.page-enter-active,
+.page-leave-active {
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.page-leave-to {
+  opacity: 0;
+}
+
+/* Hareketi azalt: tüm animasyonlar yalnızca solmaya iner */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+
+  .page-enter-from {
+    transform: none;
+  }
+
+  .motion-lift,
+  .motion-lift:hover {
+    transform: none !important;
+  }
+}

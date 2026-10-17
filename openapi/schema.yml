@@ -1,0 +1,654 @@
+openapi: 3.0.3
+info:
+  title: Fast Quiz API
+  version: 1.0.0
+  description: Fast Quiz web ve mobil istemcileri için durumsuz JSON REST API.
+paths:
+  /api/v1/categories/:
+    get:
+      operationId: categories_list
+      summary: Aktif kategoriler
+      tags:
+      - categories
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryList'
+          description: ''
+  /api/v1/leaderboard/:
+    get:
+      operationId: leaderboard_list
+      description: '`category` verilmezse tüm kategorilerin genel tablosu döner.'
+      summary: Skor tablosu (ilk 10)
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+        description: Kategori slug'ı (opsiyonel)
+      tags:
+      - leaderboard
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Leaderboard'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/v1/sessions/:
+    post:
+      operationId: sessions_create
+      description: Kategoriden rastgele sorular seçer. `session_token` yalnızca bu
+        yanıtta döner.
+      summary: Yeni quiz oturumu aç
+      parameters:
+      - in: header
+        name: X-Client
+        schema:
+          type: string
+          enum:
+          - android
+          - ios
+          - web
+        description: 'İstemci türü (varsayılan: web)'
+      tags:
+      - sessions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionCreateRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionCreated'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/v1/sessions/{session_id}/answers/:
+    post:
+      operationId: sessions_answer
+      description: 'Süre dolduysa `choice_id: null` gönderilir. Puanı sunucu hesaplar.'
+      summary: Aktif soruya cevap gönder
+      parameters:
+      - in: header
+        name: X-Session-Token
+        schema:
+          type: string
+        description: Oturum açılırken bir kez verilen gizli anahtar
+        required: true
+      - in: path
+        name: session_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - sessions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnswerRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerResult'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/v1/sessions/{session_id}/current/:
+    get:
+      operationId: sessions_current
+      description: Sıradaki soruyu verir ve süreyi başlatır. Aynı soru için tekrar
+        çağrıda aynı `deadline` döner. Süresi geçmiş soru `timeout` olarak kapatılır.
+        Doğru şık bu yanıtta asla yer almaz.
+      summary: Sıradaki soru
+      parameters:
+      - in: header
+        name: X-Session-Token
+        schema:
+          type: string
+        description: Oturum açılırken bir kez verilen gizli anahtar
+        required: true
+      - in: path
+        name: session_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - sessions
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentQuestion'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/v1/sessions/{session_id}/result/:
+    get:
+      operationId: sessions_result
+      summary: Oturum özeti ve tahmini sıralama
+      parameters:
+      - in: header
+        name: X-Session-Token
+        schema:
+          type: string
+        description: Oturum açılırken bir kez verilen gizli anahtar
+        required: true
+      - in: path
+        name: session_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - sessions
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResult'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/v1/sessions/{session_id}/score/:
+    post:
+      operationId: sessions_score
+      description: Yalnızca `player_name` gönderilir; puan oturumdan okunur. Tamamlanmış
+        bir oturum için en fazla bir kez kaydedilebilir.
+      summary: Skoru skor tablosuna kaydet
+      parameters:
+      - in: header
+        name: X-Session-Token
+        schema:
+          type: string
+        description: Oturum açılırken bir kez verilen gizli anahtar
+        required: true
+      - in: path
+        name: session_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - sessions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScoreRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoreSaved'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+components:
+  schemas:
+    AnswerRequest:
+      type: object
+      properties:
+        question_id:
+          type: integer
+        choice_id:
+          type: integer
+          nullable: true
+          description: Süre dolduysa null gönderilir
+      required:
+      - choice_id
+      - question_id
+    AnswerResult:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultEnum'
+        correct_choice_id:
+          type: integer
+        points:
+          type: integer
+        response_ms:
+          type: integer
+          description: Sunucunun ölçtüğü süre
+        total_score:
+          type: integer
+        is_last:
+          type: boolean
+      required:
+      - correct_choice_id
+      - is_last
+      - points
+      - response_ms
+      - result
+      - total_score
+    Category:
+      type: object
+      properties:
+        slug:
+          type: string
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        icon:
+          type: string
+          description: İkon adı (web ve mobil aynı seti kullanır)
+          maxLength: 50
+        color:
+          type: string
+          description: Tema token adı, ör. cat-ai
+          maxLength: 20
+        question_count:
+          type: integer
+          description: Havuzdaki aktif soru sayısı
+      required:
+      - color
+      - icon
+      - name
+      - question_count
+      - slug
+    CategoryBrief:
+      type: object
+      properties:
+        slug:
+          type: string
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        name:
+          type: string
+          maxLength: 100
+        icon:
+          type: string
+          description: İkon adı (web ve mobil aynı seti kullanır)
+          maxLength: 50
+        color:
+          type: string
+          description: Tema token adı, ör. cat-ai
+          maxLength: 20
+      required:
+      - color
+      - icon
+      - name
+      - slug
+    CategoryList:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+      required:
+      - categories
+    Choice:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+      required:
+      - id
+      - text
+    CurrentQuestion:
+      type: object
+      properties:
+        position:
+          type: integer
+          description: 0 tabanlı sıra
+        total_questions:
+          type: integer
+        question:
+          $ref: '#/components/schemas/Question'
+        time_limit_ms:
+          type: integer
+        server_time:
+          type: string
+          format: date-time
+          description: Sunucu saati; sayaç farkını düzeltmek için
+        deadline:
+          type: string
+          format: date-time
+        total_score:
+          type: integer
+      required:
+      - deadline
+      - position
+      - question
+      - server_time
+      - time_limit_ms
+      - total_questions
+      - total_score
+    ErrorBody:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Makine tarafından okunabilir hata kodu
+        message:
+          type: string
+          description: Kullanıcıya gösterilebilir Türkçe mesaj
+        details:
+          type: object
+          additionalProperties: {}
+          description: Ek bilgi (ör. alan bazlı doğrulama hataları)
+      required:
+      - code
+      - details
+      - message
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorBody'
+      required:
+      - error
+    Leaderboard:
+      type: object
+      properties:
+        category:
+          type: string
+          nullable: true
+          description: Kategori slug'ı; genel için null
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaderboardEntry'
+      required:
+      - category
+      - entries
+    LeaderboardEntry:
+      type: object
+      properties:
+        rank:
+          type: integer
+        player_name:
+          type: string
+        score:
+          type: integer
+        correct_count:
+          type: integer
+        avg_response_ms:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - avg_response_ms
+      - correct_count
+      - created_at
+      - player_name
+      - rank
+      - score
+    Question:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Choice'
+      required:
+      - choices
+      - id
+      - text
+    ResultEnum:
+      enum:
+      - correct
+      - wrong
+      - timeout
+      type: string
+      description: |-
+        * `correct` - correct
+        * `wrong` - wrong
+        * `timeout` - timeout
+    ScoreRequest:
+      type: object
+      properties:
+        player_name:
+          type: string
+          maxLength: 100
+      required:
+      - player_name
+    ScoreSaved:
+      type: object
+      properties:
+        rank:
+          type: integer
+        in_top_10:
+          type: boolean
+        score:
+          type: integer
+      required:
+      - in_top_10
+      - rank
+      - score
+    SessionCreateRequest:
+      type: object
+      properties:
+        category:
+          type: string
+          description: Kategori slug'ı
+          maxLength: 50
+      required:
+      - category
+    SessionCreated:
+      type: object
+      properties:
+        session_id:
+          type: string
+          format: uuid
+        session_token:
+          type: string
+          description: Yalnızca bu yanıtta döner; istemci saklar ve X-Session-Token
+            ile gönderir
+        category:
+          $ref: '#/components/schemas/CategoryBrief'
+        total_questions:
+          type: integer
+        time_limit_ms:
+          type: integer
+      required:
+      - category
+      - session_id
+      - session_token
+      - time_limit_ms
+      - total_questions
+    SessionResult:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryBrief'
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        total_questions:
+          type: integer
+        total_score:
+          type: integer
+        correct_count:
+          type: integer
+        wrong_count:
+          type: integer
+        empty_count:
+          type: integer
+        avg_response_ms:
+          type: integer
+        estimated_rank:
+          type: integer
+          description: Kategori skor tablosundaki tahmini (kaydedildiyse gerçek) sıra
+        in_top_10:
+          type: boolean
+        score_saved:
+          type: boolean
+      required:
+      - avg_response_ms
+      - category
+      - correct_count
+      - empty_count
+      - estimated_rank
+      - in_top_10
+      - score_saved
+      - total_questions
+      - total_score
+      - wrong_count
+    StatusEnum:
+      enum:
+      - active
+      - completed
+      - abandoned
+      type: string
+      description: |-
+        * `active` - active
+        * `completed` - completed
+        * `abandoned` - abandoned
