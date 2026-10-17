@@ -39,9 +39,8 @@ npm run build
 - `LeaderboardView`: Genel + kategori sekmeleri (`?kategori=slug`, URL'de tutulur), yarış durumuna karşı istek sayacı, boş/hata/yükleniyor durumları. İlk üç sıra madalya rozetli (`--color-medal-*`).
 - `Tekrar oyna` / `Kaydetmeden çık` oturumu siler (`quiz.reset()`).
 
-## Deploy (sonraki oturum)
-Proje geneli deploy kararı ve panele girilecek değerler `..\CLAUDE.md` ("DEPLOY" bölümü) içinde. Frontend için: DigitalOcean Static Site, build `npm ci && npm run build`, çıktı `dist`, catch-all `index.html`, BUILD_TIME env `VITE_API_BASE_URL`. Deploy `doctl` ile değil kullanıcı tarafından panelden elle yapılacak; başlamadan önce kullanıcıyla konuş. Frontend `.do/app.yaml` yazılmadı.
+## Kapsam
+Yerelde çalışan portföy projesi; **canlıya alma iptal edildi** (bkz. `..\CLAUDE.md`). README'deki ekran görüntüleri `docs/screenshots/` altında (mobil görünüm 375×812).
 
 ## Durum
-Faz 4–6 tamam: ana akış (kategori → quiz → sonuç → isim → skor tablosu) uçtan uca çalışıyor.
-Sıradaki: Faz 7 (kalite ve yayın): Playwright E2E, erişilebilirlik kontrolü, **DigitalOcean deploy (kullanıcıyla önce konuşulacak)**, Sentry. Ses efektleri (varsayılan kapalı) ve haptics henüz yok (Faz 8 ile birlikte).
+Faz 4–6 tamam: kategori → quiz → sonuç → isim → skor tablosu uçtan uca çalışıyor (128 test). Sıradaki: **Faz 8 — Capacitor ile mobil** (ayrıntılar `..\CLAUDE.md`). Ses efektleri ve haptics mobil sonrası.
